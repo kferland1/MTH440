@@ -2,7 +2,7 @@
 title: "MTH440 Salary and Retention of Massachusetts Schools"
 output: html_notebook
 ---
-
+Filtered Out Observations are due to duplicates for State Totals existing in code
 ```{r}
 library(readr); library(dplyr);library(ggplot2);library(scatterplot3d);library(rgl)
 z_Salary_Total = read.csv("SalariesTotals.csv")
@@ -24,7 +24,7 @@ a80percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 80)
 a90percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 90)
 a95percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 95)
 ```
-
+Creates initial 3D graphg with Salary/Retention/Graduation as variables. Commented out code can create snapshot at positioned angle or create a gif of graph spinning around z axis
 ```{r}
 plot3d(x=Salary_Reten_Grad_Merged$AverageSalaryInDollars, y=Salary_Reten_Grad_Merged$Teacher.Retention, z=Salary_Reten_Grad_Merged$Percent_Graduated,
        type="s", size=1,
@@ -33,6 +33,7 @@ plot3d(x=Salary_Reten_Grad_Merged$AverageSalaryInDollars, y=Salary_Reten_Grad_Me
 #movie3d(spin3d(axis=c(0,0,1), rpm=4), duration=15, dir="./")
 ```
 
+Previous 3D graph but with only observations with 80% <= grad rate
 ```{r}
 plot3d(x=a80percentGrad$AverageSalaryInDollars, y=a80percentGrad$Teacher.Retention, z=a80percentGrad$Percent_Graduated,
        type="s", size=1,
@@ -40,12 +41,14 @@ plot3d(x=a80percentGrad$AverageSalaryInDollars, y=a80percentGrad$Teacher.Retenti
 rglwidget(elementId = "nmds")
 ```
 
+Previous 3D graph but with only observations with 90% <= grad rate
 ```{r}
 plot3d(x=a90percentGrad$AverageSalaryInDollars, y=a90percentGrad$Teacher.Retention, z=a90percentGrad$Percent_Graduated,
        type="s", size=1,
        xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
 ```
 
+Previous 3D graph but with only observations with 90% <= grad rate
 ```{r}
 plot3d(x=a95percentGrad$AverageSalaryInDollars, y=a95percentGrad$Teacher.Retention, z=a95percentGrad$Percent_Graduated,
        type="s", size=1,
@@ -58,7 +61,7 @@ plot3d(x=a95percentGrad$AverageSalaryInDollars, y=a95percentGrad$Teacher.Retenti
 
 
 
-
+Below is a bunch of mess trying loess models
 
 Average files contain the average for the desired variables of a district with years
 ```{r}
