@@ -1,0 +1,119 @@
+---
+title: "MTH440 Salary and Retention of Massachusetts Schools"
+output: html_notebook
+---
+
+```{r}
+library(readr); library(dplyr);library(ggplot2);library(scatterplot3d);library(rgl)
+z_Salary_Total = read.csv("SalariesTotals.csv")
+z_Grad_Total = read.csv('GraduationTotal.csv')
+z_Reten_Total = read.csv('RetentionTotal.csv')
+z_Reten_Total = z_Reten_Total[-c(2797,2973,3085,3204,3377,3488,3782,4029,4912,5714, 5701,5856, 392, 778, 1949, 2351, 2753, 3159, 3564, 3970, 4375, 4780, 5182, 5584, 5984, 1161, 1552),]
+```
+
+Select files contain district code, the desired value, and the year. The merge file is these two files merged by district code and year
+```{r}
+z_Grad_select = subset(z_Grad_Total, select = c('District.Code', 'Percent_Graduated', 'Year'))
+z_Salary_select = subset(z_Salary_Total, select = c('District.Code', 'AverageSalaryInDollars', 'Year'))
+z_Reten_select = subset(z_Reten_Total, select = c('District.Code', 'Teacher...Retained.1', 'Year'))
+z_Reten_select = z_Reten_select %>%
+  rename('Teacher.Retention' = 'Teacher...Retained.1')
+Salary_Grad_Merged = merge(z_Grad_select, z_Salary_select)
+Salary_Reten_Grad_Merged = merge(Salary_Grad_Merged, z_Reten_select)
+a80percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 80)
+a90percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 90)
+a95percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 95)
+```
+
+```{r}
+plot3d(x=Salary_Reten_Grad_Merged$AverageSalaryInDollars, y=Salary_Reten_Grad_Merged$Teacher.Retention, z=Salary_Reten_Grad_Merged$Percent_Graduated,
+       type="s", size=1,
+       xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
+#rgl.snapshot("SalaryRetentionGraduation_3d.png") Takes a snapshot of graph at current position
+movie3d(spin3d(axis=c(0,0,1), rpm=4), duration=15, dir="./")
+```
+
+```{r}
+plot3d(x=a80percentGrad$AverageSalaryInDollars, y=a80percentGrad$Teacher.Retention, z=a80percentGrad$Percent_Graduated,
+       type="s", size=1,
+       xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
+rglwidget(elementId = "nmds")
+```
+
+```{r}
+plot3d(x=a90percentGrad$AverageSalaryInDollars, y=a90percentGrad$Teacher.Retention, z=a90percentGrad$Percent_Graduated,
+       type="s", size=1,
+       xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
+```
+
+```{r}
+plot3d(x=a95percentGrad$AverageSalaryInDollars, y=a95percentGrad$Teacher.Retention, z=a95percentGrad$Percent_Graduated,
+       type="s", size=1,
+       xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
+```
+
+
+
+
+
+
+
+
+
+Average files contain the average for the desired variables of a district with years
+```{r}
+z_Salary_Merged_Average = Salary_Grad_Merged %>% group_by(District.Code) %>%
+  summarise(mean_salary = mean(AverageSalaryInDollars))
+z_Grad_Merged_Average = Salary_Grad_Merged %>% group_by(District.Code) %>%
+  summarise(mean_grad = mean(Percent_Graduated))
+Salary_Grad_Average = merge(z_Salary_Merged_Average, z_Grad_Merged_Average)
+Salary_Grad_Average= Salary_Grad_Average %>% arrange(mean_salary)
+```
+
+Plot of salary versus graduation of all districts averaged out. Outliers do exist on this plot
+```{r}
+ggplot(Salary_Grad_Average, aes(x=mean_salary, y=mean_grad)) +
+  geom_point(col="black") +
+  geom_smooth(method="loess", se=FALSE, col="red")
+```
+
+Outliers of districts with a graduation rate lower than 50% were removed.
+```{r}
+Salary_Grad_Average_Filter = filter(Salary_Grad_Average, mean_grad>50)
+ggplot(Salary_Grad_Average_Filter, aes(x=mean_salary, y=mean_grad)) +
+  geom_point(col="black") +
+  geom_smooth(method="loess", se=FALSE,col="red") +
+  coord_cartesian(xlim=c(30000,110000)) +
+  annotate("text", x=100000, y=60,
+           label="minimum of 50% grad rate",
+           col="blue",
+           size=4)
+```
+
+```{r}
+Salary_Grad_Average_Filter$index = 1:nrow(Salary_Grad_Average_Filter)
+loessMod10 = loess(mean_grad ~ index, data=Salary_Grad_Average_Filter, span=0.1)
+loessMod50 = loess(mean_grad ~ index, data=Salary_Grad_Average_Filter, span=0.5)
+smoothed10 = predict(loessMod10)
+smoothed50 = predict(loessMod50)
+plot(Salary_Grad_Average_Filter$mean_grad, x=Salary_Grad_Average_Filter$mean_salary, main="Local Regression & Prediction of Avg Salary & Avg Grad of Districts", xlab = "Average Salary", ylab = "Average Graduation", pch=18)
+lines(smoothed10, x=Salary_Grad_Average_Filter$mean_salary, col="red", lwd=2.5)
+lines(smoothed50, x=Salary_Grad_Average_Filter$mean_salary, col="blue", lty=2, lwd=2.5)
+legend(30000, 65, legend=c("0.1 Span","0.5 Span"),
+       col=c("red", "blue"),lty=1:2, cex=0.8)
+```
+
+```{r}
+data(economics, package="ggplot2")  # load data
+economics$index <- 1:nrow(economics)  # create index variable
+loessMod10 <- loess(uempmed ~ index, data=economics, span=0.10) # 10% smoothing span
+smoothed10 <- predict(loessMod10) 
+plot(economics$uempmed, x=economics$date, type="l", main="Loess Smoothing and Prediction", xlab="Date", ylab="Unemployment (Median)")
+lines(smoothed10, x=economics$date, col="red")
+```
+
+
+
+
+
+
