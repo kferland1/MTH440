@@ -29,8 +29,8 @@ a95percentGrad = filter(Salary_Reten_Grad_Merged, Percent_Graduated > 95)
 plot3d(x=Salary_Reten_Grad_Merged$AverageSalaryInDollars, y=Salary_Reten_Grad_Merged$Teacher.Retention, z=Salary_Reten_Grad_Merged$Percent_Graduated,
        type="s", size=1,
        xlab = "Average Teacher Salary", ylab= "Teacher Retention Rate", zlab= "Graduation Rate")
-#rgl.snapshot("SalaryRetentionGraduation_3d.png") Takes a snapshot of graph at current position
-movie3d(spin3d(axis=c(0,0,1), rpm=4), duration=15, dir="./")
+#rgl.snapshot("SalaryRetentionGraduation_3d.png")
+#movie3d(spin3d(axis=c(0,0,1), rpm=4), duration=15, dir="./")
 ```
 
 ```{r}
@@ -102,18 +102,3 @@ lines(smoothed50, x=Salary_Grad_Average_Filter$mean_salary, col="blue", lty=2, l
 legend(30000, 65, legend=c("0.1 Span","0.5 Span"),
        col=c("red", "blue"),lty=1:2, cex=0.8)
 ```
-
-```{r}
-data(economics, package="ggplot2")  # load data
-economics$index <- 1:nrow(economics)  # create index variable
-loessMod10 <- loess(uempmed ~ index, data=economics, span=0.10) # 10% smoothing span
-smoothed10 <- predict(loessMod10) 
-plot(economics$uempmed, x=economics$date, type="l", main="Loess Smoothing and Prediction", xlab="Date", ylab="Unemployment (Median)")
-lines(smoothed10, x=economics$date, col="red")
-```
-
-
-
-
-
-
