@@ -50,10 +50,6 @@ ggplot(SALARYGRADAVG, aes(x=mean_salary,y=mean_grad)) + #Graph of Averaged Salar
   geom_point() +
   geom_smooth(method="lm", se=FALSE)
 
-ggplot(SALARYGRADAVG, aes(x=mean_salary,y=mean_grad)) + #Graph of Averaged Salary
-  geom_point() +
-  geom_smooth(method="lm", se=FALSE)
-
 SALARYGRADAVGFILTER = filter(SALARYGRADAVG, mean_grad > 50)
 
 ggplot(SALARYGRADAVGFILTER, aes(x=mean_salary,y=mean_grad)) + #Graph of Averaged Salary filtered for 50% graduation minimum
@@ -130,63 +126,11 @@ ggplot(cgmergeFILTERED, aes(x=Average.Class.Size,y=Percent_Graduated)) + #Graph 
 
 sgmergeFILTERED = filter(sgmerge, Percent_Graduated > 50)
 
-ggplot(sgmergeFILTERED, aes(x=AverageSalaryInDollarsScaled,y=Percent_Graduated)) + #Graph of Salary for every district every year
+ggplot(sgmergeFILTERED, aes(x=AverageSalaryInDollars,y=Percent_Graduated)) + #Graph of Salary for every district every year
   geom_point() +
-  annotate("text", x = 0.75, y = 52,
-           label = "Salary scaled from max salary of $136,349",
-           col = "blue",
-           size = 5) +
-geom_smooth(method="lm", se=FALSE)
+  geom_smooth(method="lm", se=FALSE)
 
 cor(sgmerge$AverageSalaryInDollars, sgmerge$Percent_Graduated) # 0.2309
 cor(cgmerge$Average.Class.Size, cgmerge$Percent_Graduated) # -0.0661
 cor(sgmergeFILTERED$AverageSalaryInDollars, sgmergeFILTERED$Percent_Graduated) # 0.2980
 cor(cgmergeFILTERED$Average.Class.Size, cgmergeFILTERED$Percent_Graduated) # -0.0227
-
-
-q = sgmerge[sgmerge$Year == "2019",]
-p = cgmerge[cgmerge$Year == "2019",]
-
-
-ggplot(q, aes(x=AverageSalaryInDollars, y=Percent_Graduated)) +
-  geom_point() +
-  geom_smooth(method="lm", se=FALSE)
-
-
-ggplot(p, aes(x=Average.Class.Size, y=Percent_Graduated)) +
-  geom_point() +
-  geom_smooth(method="lm", se=FALSE)
-
-
-pFILTERED = filter(p, Percent_Graduated > 55)
-
-
-ggplot(pFILTERED, aes(x=Average.Class.Size, y=Percent_Graduated)) +
-  geom_point() +
-  geom_smooth(method="lm", se=FALSE)
-
-
-cor(p$Average.Class.Size, p$Percent_Graduated) # -0.1265
-cor(q$AverageSalaryInDollars, q$Percent_Graduated) # 0.2274
-cor(pFILTERED$Average.Class.Size, pFILTERED$Percent_Graduated) # -0.0035
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
