@@ -1,4 +1,5 @@
 library(readr); library(dplyr);library(ggplot2)
+#A x next to a dataset's name means it is not referenced and only essential for transformation
 xs = read.csv("SalariesTotals.csv")
 xg = read.csv('GraduationTotal.csv')
 xc = read.csv('ClassTotal.csv')
@@ -7,7 +8,7 @@ xcselect = subset(xc, select = c('District.Code', 'Average.Class.Size','Year'))
 xgselect = subset(xg, select = c('District.Code', 'Percent_Graduated', 'Year'))
 xsselect = subset(xs, select = c('District.Code', 'AverageSalaryInDollars', 'Year'))
 
-
+#ClassGradMerge, SalaryGradMerge
 cgmerge = merge(xcselect, xgselect)
 sgmerge = merge(xsselect, xgselect)
 
